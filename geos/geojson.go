@@ -33,7 +33,8 @@ func (d *geoJSONDecoder) decode(geoJSON string) (*Geometry, error) {
 		return nil, Error()
 	}
 
-	return geomFromPtr(g), nil}
+	return geomFromPtr(g), nil
+}
 
 type geoJSONEncoder struct {
 }

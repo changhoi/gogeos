@@ -29,4 +29,3 @@ func TestGeoJSONEncoder(t *testing.T) {
 		}
 	}
 }
-
