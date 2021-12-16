@@ -5,7 +5,7 @@ from pycparser import c_parser, c_ast, parse_file
 
 Func = namedtuple('Func', ('name', 'type', 'args'))
 Arg = namedtuple('Arg', ('name', 'type'))
-Type = namedtuple('Type', ('ptr', 'name', 'array'))
+Type = namedtuple('Type', ('ptr', 'name', 'array', 'enum'))
 
 class FuncDeclVisitor(c_ast.NodeVisitor):
     def __init__(self):
@@ -51,13 +51,18 @@ class FuncDeclVisitor(c_ast.NodeVisitor):
         self.visit(node.type)
 
     def visit_IdentifierType(self, node):
-        type_ = Type(self.ptr, ' '.join(node.names), self.array)
+        type_ = Type(self.ptr, ' '.join(node.names), self.array, False)
         if self.inargs:
             self.args.append(Arg(self.argname, type_))
         else:
             self.type = type_
         self.ptr = ''
         self.array = False
+
+    def visit_Enum(self, node):
+        if self.inargs:
+            type_ = Type(self.ptr, node.name, self.array, True)
+            self.args.append(Arg(self.argname, type_))
 
 def cgo_func_wrappers(filename):
     ast = parse_file(filename, use_cpp=True)
@@ -102,8 +107,15 @@ import (
     }
 
     for func in threadsafe:
-        def gotype(ctype):
-            type_ = "C." + typemap.get(ctype.name, ctype.name)
+        def gotype(arg, ctype):
+            if arg is not None and arg.name is None:
+                return ""
+
+            if ctype.enum:
+                type_ = "C.enum_" + ctype.name
+            else:
+                type_ = "C." + typemap.get(ctype.name, ctype.name)
+
             if ctype.ptr:
                 type_ = ctype.ptr + type_
             if ctype.array:
@@ -111,13 +123,17 @@ import (
             return type_
         
         def goident(arg, inbody=True):
-            def voidptr(ctype):
-                return ctype.ptr and ctype.name == 'void'
+            def voidarg(a):
+                return a.name is None
+            def voidptr(a, ctype):
+                return a.name is not None and ctype.ptr and ctype.name == 'void'
 
             ident = identmap.get(arg.name, arg.name)
             if arg.type.array and inbody:
                 ident = '&' + ident + '[0]'
-            if voidptr(arg.type) and inbody:
+            if voidarg(arg):
+                ident = ''
+            if voidptr(arg, arg.type) and inbody:
                 ident = 'unsafe.Pointer(' + ident + ')'
             return ident
 
@@ -127,8 +143,8 @@ import (
             gosig += " $result"
         gosig += " {"
         t = Template(gosig)
-        params = ", ".join([goident(p, inbody=False) + " " + gotype(p.type) for p in func.args if p.type.name != 'GEOSContextHandle_t'])
-        result = gotype(func.type)
+        params = ", ".join([goident(p, inbody=False) + " " + gotype(p, p.type) for p in func.args if p.type.name != 'GEOSContextHandle_t'])
+        result = gotype(None, func.type)
         func_name = "c" + func.name
         if func_name.endswith('_r'):
             func_name = func_name[:-2]

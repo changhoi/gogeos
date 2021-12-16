@@ -11,6 +11,22 @@ import (
 	"unsafe"
 )
 
+func cGEOS_interruptRegisterCallback(cb *C.GEOSInterruptCallback) *C.GEOSInterruptCallback {
+	return C.GEOS_interruptRegisterCallback(cb)
+}
+
+func cGEOS_interruptRequest() {
+	C.GEOS_interruptRequest()
+}
+
+func cGEOS_interruptCancel() {
+	C.GEOS_interruptCancel()
+}
+
+func cGEOSversion() *C.char {
+	return C.GEOSversion()
+}
+
 func cinitGEOS(notice_function C.GEOSMessageHandler, error_function C.GEOSMessageHandler) C.GEOSContextHandle_t {
 	return C.initGEOS_r(notice_function, error_function)
 }
@@ -21,74 +37,34 @@ func cfinishGEOS() {
 	C.finishGEOS_r(handle)
 }
 
-func cGEOSversion() *C.char {
-	return C.GEOSversion()
-}
-
-func cGEOSGeomFromWKT(wkt *C.char) *C.GEOSGeometry {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOSGeomFromWKT_r(handle, wkt)
-}
-
-func cGEOSGeomToWKT(g *C.GEOSGeometry) *C.char {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOSGeomToWKT_r(handle, g)
-}
-
-func cGEOS_getWKBOutputDims() C.int {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOS_getWKBOutputDims_r(handle)
-}
-
-func cGEOS_setWKBOutputDims(newDims C.int) C.int {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOS_setWKBOutputDims_r(handle, newDims)
-}
-
-func cGEOS_getWKBByteOrder() C.int {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOS_getWKBByteOrder_r(handle)
-}
-
-func cGEOS_setWKBByteOrder(byteOrder C.int) C.int {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOS_setWKBByteOrder_r(handle, byteOrder)
-}
-
-func cGEOSGeomFromWKB_buf(wkb *C.uchar, size C.size_t) *C.GEOSGeometry {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOSGeomFromWKB_buf_r(handle, wkb, size)
-}
-
-func cGEOSGeomToWKB_buf(g *C.GEOSGeometry, size *C.size_t) *C.uchar {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOSGeomToWKB_buf_r(handle, g, size)
-}
-
-func cGEOSGeomFromHEX_buf(hex *C.uchar, size C.size_t) *C.GEOSGeometry {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOSGeomFromHEX_buf_r(handle, hex, size)
-}
-
-func cGEOSGeomToHEX_buf(g *C.GEOSGeometry, size *C.size_t) *C.uchar {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOSGeomToHEX_buf_r(handle, g, size)
-}
-
 func cGEOSCoordSeq_create(size C.uint, dims C.uint) *C.GEOSCoordSequence {
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	return C.GEOSCoordSeq_create_r(handle, size, dims)
+}
+
+func cGEOSCoordSeq_copyFromBuffer(buf *C.double, size C.uint, hasZ C.int, hasM C.int) *C.GEOSCoordSequence {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSCoordSeq_copyFromBuffer_r(handle, buf, size, hasZ, hasM)
+}
+
+func cGEOSCoordSeq_copyFromArrays(x *C.double, y *C.double, z *C.double, m *C.double, size C.uint) *C.GEOSCoordSequence {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSCoordSeq_copyFromArrays_r(handle, x, y, z, m, size)
+}
+
+func cGEOSCoordSeq_copyToBuffer(s *C.GEOSCoordSequence, buf *C.double, hasZ C.int, hasM C.int) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSCoordSeq_copyToBuffer_r(handle, s, buf, hasZ, hasM)
+}
+
+func cGEOSCoordSeq_copyToArrays(s *C.GEOSCoordSequence, x *C.double, y *C.double, z *C.double, m *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSCoordSeq_copyToArrays_r(handle, s, x, y, z, m)
 }
 
 func cGEOSCoordSeq_clone(s *C.GEOSCoordSequence) *C.GEOSCoordSequence {
@@ -121,6 +97,18 @@ func cGEOSCoordSeq_setZ(s *C.GEOSCoordSequence, idx C.uint, val C.double) C.int 
 	return C.GEOSCoordSeq_setZ_r(handle, s, idx, val)
 }
 
+func cGEOSCoordSeq_setXY(s *C.GEOSCoordSequence, idx C.uint, x C.double, y C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSCoordSeq_setXY_r(handle, s, idx, x, y)
+}
+
+func cGEOSCoordSeq_setXYZ(s *C.GEOSCoordSequence, idx C.uint, x C.double, y C.double, z C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSCoordSeq_setXYZ_r(handle, s, idx, x, y, z)
+}
+
 func cGEOSCoordSeq_setOrdinate(s *C.GEOSCoordSequence, idx C.uint, dim C.uint, val C.double) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
@@ -145,6 +133,18 @@ func cGEOSCoordSeq_getZ(s *C.GEOSCoordSequence, idx C.uint, val *C.double) C.int
 	return C.GEOSCoordSeq_getZ_r(handle, s, idx, val)
 }
 
+func cGEOSCoordSeq_getXY(s *C.GEOSCoordSequence, idx C.uint, x *C.double, y *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSCoordSeq_getXY_r(handle, s, idx, x, y)
+}
+
+func cGEOSCoordSeq_getXYZ(s *C.GEOSCoordSequence, idx C.uint, x *C.double, y *C.double, z *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSCoordSeq_getXYZ_r(handle, s, idx, x, y, z)
+}
+
 func cGEOSCoordSeq_getOrdinate(s *C.GEOSCoordSequence, idx C.uint, dim C.uint, val *C.double) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
@@ -163,16 +163,22 @@ func cGEOSCoordSeq_getDimensions(s *C.GEOSCoordSequence, dims *C.uint) C.int {
 	return C.GEOSCoordSeq_getDimensions_r(handle, s, dims)
 }
 
-func cGEOSProject(g *C.GEOSGeometry, p *C.GEOSGeometry) C.double {
+func cGEOSCoordSeq_isCCW(s *C.GEOSCoordSequence, is_ccw *C.char) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSProject_r(handle, g, p)
+	return C.GEOSCoordSeq_isCCW_r(handle, s, is_ccw)
 }
 
-func cGEOSInterpolate(g *C.GEOSGeometry, d C.double) *C.GEOSGeometry {
+func cGEOSProject(line *C.GEOSGeometry, point *C.GEOSGeometry) C.double {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSInterpolate_r(handle, g, d)
+	return C.GEOSProject_r(handle, line, point)
+}
+
+func cGEOSInterpolate(line *C.GEOSGeometry, d C.double) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSInterpolate_r(handle, line, d)
 }
 
 func cGEOSProjectNormalized(g *C.GEOSGeometry, p *C.GEOSGeometry) C.double {
@@ -185,6 +191,12 @@ func cGEOSInterpolateNormalized(g *C.GEOSGeometry, d C.double) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	return C.GEOSInterpolateNormalized_r(handle, g, d)
+}
+
+func cGEOSBuffer(g *C.GEOSGeometry, width C.double, quadsegs C.int) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSBuffer_r(handle, g, width, quadsegs)
 }
 
 func cGEOSBufferParams_create() *C.GEOSBufferParams {
@@ -229,40 +241,40 @@ func cGEOSBufferParams_setSingleSided(p *C.GEOSBufferParams, singleSided C.int) 
 	return C.GEOSBufferParams_setSingleSided_r(handle, p, singleSided)
 }
 
-func cGEOSBufferWithParams(g1 *C.GEOSGeometry, p *C.GEOSBufferParams, width C.double) *C.GEOSGeometry {
+func cGEOSBufferWithParams(g *C.GEOSGeometry, p *C.GEOSBufferParams, width C.double) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSBufferWithParams_r(handle, g1, p, width)
+	return C.GEOSBufferWithParams_r(handle, g, p, width)
 }
 
-func cGEOSBuffer(g1 *C.GEOSGeometry, width C.double, quadsegs C.int) *C.GEOSGeometry {
+func cGEOSBufferWithStyle(g *C.GEOSGeometry, width C.double, quadsegs C.int, endCapStyle C.int, joinStyle C.int, mitreLimit C.double) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSBuffer_r(handle, g1, width, quadsegs)
+	return C.GEOSBufferWithStyle_r(handle, g, width, quadsegs, endCapStyle, joinStyle, mitreLimit)
 }
 
-func cGEOSBufferWithStyle(g1 *C.GEOSGeometry, width C.double, quadsegs C.int, endCapStyle C.int, joinStyle C.int, mitreLimit C.double) *C.GEOSGeometry {
+func cGEOSDensify(g *C.GEOSGeometry, tolerance C.double) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSBufferWithStyle_r(handle, g1, width, quadsegs, endCapStyle, joinStyle, mitreLimit)
+	return C.GEOSDensify_r(handle, g, tolerance)
 }
 
-func cGEOSSingleSidedBuffer(g1 *C.GEOSGeometry, width C.double, quadsegs C.int, joinStyle C.int, mitreLimit C.double, leftSide C.int) *C.GEOSGeometry {
+func cGEOSOffsetCurve(g *C.GEOSGeometry, width C.double, quadsegs C.int, joinStyle C.int, mitreLimit C.double) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSSingleSidedBuffer_r(handle, g1, width, quadsegs, joinStyle, mitreLimit, leftSide)
-}
-
-func cGEOSOffsetCurve(g1 *C.GEOSGeometry, width C.double, quadsegs C.int, joinStyle C.int, mitreLimit C.double) *C.GEOSGeometry {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOSOffsetCurve_r(handle, g1, width, quadsegs, joinStyle, mitreLimit)
+	return C.GEOSOffsetCurve_r(handle, g, width, quadsegs, joinStyle, mitreLimit)
 }
 
 func cGEOSGeom_createPoint(s *C.GEOSCoordSequence) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	return C.GEOSGeom_createPoint_r(handle, s)
+}
+
+func cGEOSGeom_createPointFromXY(x C.double, y C.double) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeom_createPointFromXY_r(handle, x, y)
 }
 
 func cGEOSGeom_createEmptyPoint() *C.GEOSGeometry {
@@ -325,10 +337,10 @@ func cGEOSGeom_destroy(g *C.GEOSGeometry) {
 	C.GEOSGeom_destroy_r(handle, g)
 }
 
-func cGEOSEnvelope(g1 *C.GEOSGeometry) *C.GEOSGeometry {
+func cGEOSEnvelope(g *C.GEOSGeometry) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSEnvelope_r(handle, g1)
+	return C.GEOSEnvelope_r(handle, g)
 }
 
 func cGEOSIntersection(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) *C.GEOSGeometry {
@@ -337,10 +349,10 @@ func cGEOSIntersection(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) *C.GEOSGeometry {
 	return C.GEOSIntersection_r(handle, g1, g2)
 }
 
-func cGEOSConvexHull(g1 *C.GEOSGeometry) *C.GEOSGeometry {
+func cGEOSIntersectionPrec(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, gridSize C.double) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSConvexHull_r(handle, g1)
+	return C.GEOSIntersectionPrec_r(handle, g1, g2, gridSize)
 }
 
 func cGEOSDifference(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) *C.GEOSGeometry {
@@ -349,16 +361,22 @@ func cGEOSDifference(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) *C.GEOSGeometry {
 	return C.GEOSDifference_r(handle, g1, g2)
 }
 
+func cGEOSDifferencePrec(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, gridSize C.double) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSDifferencePrec_r(handle, g1, g2, gridSize)
+}
+
 func cGEOSSymDifference(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	return C.GEOSSymDifference_r(handle, g1, g2)
 }
 
-func cGEOSBoundary(g1 *C.GEOSGeometry) *C.GEOSGeometry {
+func cGEOSSymDifferencePrec(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, gridSize C.double) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSBoundary_r(handle, g1)
+	return C.GEOSSymDifferencePrec_r(handle, g1, g2, gridSize)
 }
 
 func cGEOSUnion(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) *C.GEOSGeometry {
@@ -367,22 +385,82 @@ func cGEOSUnion(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) *C.GEOSGeometry {
 	return C.GEOSUnion_r(handle, g1, g2)
 }
 
+func cGEOSUnionPrec(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, gridSize C.double) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSUnionPrec_r(handle, g1, g2, gridSize)
+}
+
 func cGEOSUnaryUnion(g *C.GEOSGeometry) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	return C.GEOSUnaryUnion_r(handle, g)
 }
 
-func cGEOSUnionCascaded(g1 *C.GEOSGeometry) *C.GEOSGeometry {
+func cGEOSUnaryUnionPrec(g *C.GEOSGeometry, gridSize C.double) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSUnionCascaded_r(handle, g1)
+	return C.GEOSUnaryUnionPrec_r(handle, g, gridSize)
 }
 
-func cGEOSPointOnSurface(g1 *C.GEOSGeometry) *C.GEOSGeometry {
+func cGEOSBoundary(g *C.GEOSGeometry) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSPointOnSurface_r(handle, g1)
+	return C.GEOSBoundary_r(handle, g)
+}
+
+func cGEOSConvexHull(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSConvexHull_r(handle, g)
+}
+
+func cGEOSMinimumRotatedRectangle(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSMinimumRotatedRectangle_r(handle, g)
+}
+
+func cGEOSMaximumInscribedCircle(g *C.GEOSGeometry, tolerance C.double) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSMaximumInscribedCircle_r(handle, g, tolerance)
+}
+
+func cGEOSLargestEmptyCircle(g *C.GEOSGeometry, boundary *C.GEOSGeometry, tolerance C.double) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSLargestEmptyCircle_r(handle, g, boundary, tolerance)
+}
+
+func cGEOSMinimumWidth(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSMinimumWidth_r(handle, g)
+}
+
+func cGEOSMinimumClearance(g *C.GEOSGeometry, distance *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSMinimumClearance_r(handle, g, distance)
+}
+
+func cGEOSMinimumClearanceLine(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSMinimumClearanceLine_r(handle, g)
+}
+
+func cGEOSCoverageUnion(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSCoverageUnion_r(handle, g)
+}
+
+func cGEOSPointOnSurface(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSPointOnSurface_r(handle, g)
 }
 
 func cGEOSGetCentroid(g *C.GEOSGeometry) *C.GEOSGeometry {
@@ -391,10 +469,34 @@ func cGEOSGetCentroid(g *C.GEOSGeometry) *C.GEOSGeometry {
 	return C.GEOSGetCentroid_r(handle, g)
 }
 
+func cGEOSMinimumBoundingCircle(g *C.GEOSGeometry, radius *C.double, center **C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSMinimumBoundingCircle_r(handle, g, radius, center)
+}
+
+func cGEOSNode(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSNode_r(handle, g)
+}
+
+func cGEOSClipByRect(g *C.GEOSGeometry, xmin C.double, ymin C.double, xmax C.double, ymax C.double) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSClipByRect_r(handle, g, xmin, ymin, xmax, ymax)
+}
+
 func cGEOSPolygonize(geoms []*C.GEOSGeometry, ngeoms C.uint) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	return C.GEOSPolygonize_r(handle, &geoms[0], ngeoms)
+}
+
+func cGEOSPolygonize_valid(geoms []*C.GEOSGeometry, ngems C.uint) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSPolygonize_valid_r(handle, &geoms[0], ngems)
 }
 
 func cGEOSPolygonizer_getCutEdges(geoms []*C.GEOSGeometry, ngeoms C.uint) *C.GEOSGeometry {
@@ -409,22 +511,34 @@ func cGEOSPolygonize_full(input *C.GEOSGeometry, cuts **C.GEOSGeometry, dangles 
 	return C.GEOSPolygonize_full_r(handle, input, cuts, dangles, invalidRings)
 }
 
+func cGEOSBuildArea(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSBuildArea_r(handle, g)
+}
+
 func cGEOSLineMerge(g *C.GEOSGeometry) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	return C.GEOSLineMerge_r(handle, g)
 }
 
-func cGEOSSimplify(g1 *C.GEOSGeometry, tolerance C.double) *C.GEOSGeometry {
+func cGEOSReverse(g *C.GEOSGeometry) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSSimplify_r(handle, g1, tolerance)
+	return C.GEOSReverse_r(handle, g)
 }
 
-func cGEOSTopologyPreserveSimplify(g1 *C.GEOSGeometry, tolerance C.double) *C.GEOSGeometry {
+func cGEOSSimplify(g *C.GEOSGeometry, tolerance C.double) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSTopologyPreserveSimplify_r(handle, g1, tolerance)
+	return C.GEOSSimplify_r(handle, g, tolerance)
+}
+
+func cGEOSTopologyPreserveSimplify(g *C.GEOSGeometry, tolerance C.double) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSTopologyPreserveSimplify_r(handle, g, tolerance)
 }
 
 func cGEOSGeom_extractUniquePoints(g *C.GEOSGeometry) *C.GEOSGeometry {
@@ -443,6 +557,30 @@ func cGEOSSnap(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, tolerance C.double) *C.GE
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	return C.GEOSSnap_r(handle, g1, g2, tolerance)
+}
+
+func cGEOSDelaunayTriangulation(g *C.GEOSGeometry, tolerance C.double, onlyEdges C.int) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSDelaunayTriangulation_r(handle, g, tolerance, onlyEdges)
+}
+
+func cGEOSConstrainedDelaunayTriangulation(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSConstrainedDelaunayTriangulation_r(handle, g)
+}
+
+func cGEOSVoronoiDiagram(g *C.GEOSGeometry, env *C.GEOSGeometry, tolerance C.double, onlyEdges C.int) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSVoronoiDiagram_r(extHandle, g, env, tolerance, onlyEdges)
+}
+
+func cGEOSSegmentIntersection(ax0 C.double, ay0 C.double, ax1 C.double, ay1 C.double, bx0 C.double, by0 C.double, bx1 C.double, by1 C.double, cx *C.double, cy *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSSegmentIntersection_r(extHandle, ax0, ay0, ax1, ay1, bx0, by0, bx1, by1, cx, cy)
 }
 
 func cGEOSDisjoint(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) C.char {
@@ -493,12 +631,6 @@ func cGEOSEquals(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) C.char {
 	return C.GEOSEquals_r(handle, g1, g2)
 }
 
-func cGEOSEqualsExact(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, tolerance C.double) C.char {
-	handlemu.Lock()
-	defer handlemu.Unlock()
-	return C.GEOSEqualsExact_r(handle, g1, g2, tolerance)
-}
-
 func cGEOSCovers(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) C.char {
 	handlemu.Lock()
 	defer handlemu.Unlock()
@@ -509,6 +641,12 @@ func cGEOSCoveredBy(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) C.char {
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	return C.GEOSCoveredBy_r(handle, g1, g2)
+}
+
+func cGEOSEqualsExact(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, tolerance C.double) C.char {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSEqualsExact_r(handle, g1, g2, tolerance)
 }
 
 func cGEOSPrepare(g *C.GEOSGeometry) *C.GEOSPreparedGeometry {
@@ -583,6 +721,24 @@ func cGEOSPreparedWithin(pg1 *C.GEOSPreparedGeometry, g2 *C.GEOSGeometry) C.char
 	return C.GEOSPreparedWithin_r(handle, pg1, g2)
 }
 
+func cGEOSPreparedNearestPoints(pg1 *C.GEOSPreparedGeometry, g2 *C.GEOSGeometry) *C.GEOSCoordSequence {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSPreparedNearestPoints_r(handle, pg1, g2)
+}
+
+func cGEOSPreparedDistance(pg1 *C.GEOSPreparedGeometry, g2 *C.GEOSGeometry, dist *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSPreparedDistance_r(handle, pg1, g2, dist)
+}
+
+func cGEOSPreparedDistanceWithin(pg1 *C.GEOSPreparedGeometry, g2 *C.GEOSGeometry, dist C.double) C.char {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSPreparedDistanceWithin_r(handle, pg1, g2, dist)
+}
+
 func cGEOSSTRtree_create(nodeCapacity C.size_t) *C.GEOSSTRtree {
 	handlemu.Lock()
 	defer handlemu.Unlock()
@@ -599,6 +755,18 @@ func cGEOSSTRtree_query(tree *C.GEOSSTRtree, g *C.GEOSGeometry, callback C.GEOSQ
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	C.GEOSSTRtree_query_r(handle, tree, g, callback, unsafe.Pointer(userdata))
+}
+
+func cGEOSSTRtree_nearest(tree *C.GEOSSTRtree, geom *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSSTRtree_nearest_r(handle, tree, geom)
+}
+
+func cGEOSSTRtree_nearest_generic(tree *C.GEOSSTRtree, item *C.void, itemEnvelope *C.GEOSGeometry, distancefn C.GEOSDistanceCallback, userdata *C.void) {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	C.GEOSSTRtree_nearest_generic_r(handle, tree, unsafe.Pointer(item), itemEnvelope, distancefn, unsafe.Pointer(userdata))
 }
 
 func cGEOSSTRtree_iterate(tree *C.GEOSSTRtree, callback C.GEOSQueryCallback, userdata *C.void) {
@@ -619,34 +787,34 @@ func cGEOSSTRtree_destroy(tree *C.GEOSSTRtree) {
 	C.GEOSSTRtree_destroy_r(handle, tree)
 }
 
-func cGEOSisEmpty(g1 *C.GEOSGeometry) C.char {
+func cGEOSisEmpty(g *C.GEOSGeometry) C.char {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSisEmpty_r(handle, g1)
+	return C.GEOSisEmpty_r(handle, g)
 }
 
-func cGEOSisSimple(g1 *C.GEOSGeometry) C.char {
+func cGEOSisSimple(g *C.GEOSGeometry) C.char {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSisSimple_r(handle, g1)
+	return C.GEOSisSimple_r(handle, g)
 }
 
-func cGEOSisRing(g1 *C.GEOSGeometry) C.char {
+func cGEOSisRing(g *C.GEOSGeometry) C.char {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSisRing_r(handle, g1)
+	return C.GEOSisRing_r(handle, g)
 }
 
-func cGEOSHasZ(g1 *C.GEOSGeometry) C.char {
+func cGEOSHasZ(g *C.GEOSGeometry) C.char {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSHasZ_r(handle, g1)
+	return C.GEOSHasZ_r(handle, g)
 }
 
-func cGEOSisClosed(g1 *C.GEOSGeometry) C.char {
+func cGEOSisClosed(g *C.GEOSGeometry) C.char {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSisClosed_r(handle, g1)
+	return C.GEOSisClosed_r(handle, g)
 }
 
 func cGEOSRelatePattern(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, pat *C.char) C.char {
@@ -673,16 +841,16 @@ func cGEOSRelateBoundaryNodeRule(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, bnr C.i
 	return C.GEOSRelateBoundaryNodeRule_r(handle, g1, g2, bnr)
 }
 
-func cGEOSisValid(g1 *C.GEOSGeometry) C.char {
+func cGEOSisValid(g *C.GEOSGeometry) C.char {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSisValid_r(handle, g1)
+	return C.GEOSisValid_r(handle, g)
 }
 
-func cGEOSisValidReason(g1 *C.GEOSGeometry) *C.char {
+func cGEOSisValidReason(g *C.GEOSGeometry) *C.char {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSisValidReason_r(handle, g1)
+	return C.GEOSisValidReason_r(handle, g)
 }
 
 func cGEOSisValidDetail(g *C.GEOSGeometry, flags C.int, reason **C.char, location **C.GEOSGeometry) C.char {
@@ -691,16 +859,52 @@ func cGEOSisValidDetail(g *C.GEOSGeometry, flags C.int, reason **C.char, locatio
 	return C.GEOSisValidDetail_r(handle, g, flags, reason, location)
 }
 
-func cGEOSGeomType(g1 *C.GEOSGeometry) *C.char {
+func cGEOSMakeValid(g *C.GEOSGeometry) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSGeomType_r(handle, g1)
+	return C.GEOSMakeValid_r(handle, g)
 }
 
-func cGEOSGeomTypeId(g1 *C.GEOSGeometry) C.int {
+func cGEOSMakeValidWithParams(g *C.GEOSGeometry, makeValidParams *C.GEOSMakeValidParams) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSGeomTypeId_r(handle, g1)
+	return C.GEOSMakeValidWithParams_r(handle, g, makeValidParams)
+}
+
+func cGEOSMakeValidParams_create() *C.GEOSMakeValidParams {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSMakeValidParams_create_r(extHandle)
+}
+
+func cGEOSMakeValidParams_destroy(parms *C.GEOSMakeValidParams) {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	C.GEOSMakeValidParams_destroy_r(handle, parms)
+}
+
+func cGEOSMakeValidParams_setMethod(p *C.GEOSMakeValidParams, method C.enum_GEOSMakeValidMethods) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSMakeValidParams_setMethod_r(handle, p, method)
+}
+
+func cGEOSMakeValidParams_setKeepCollapsed(p *C.GEOSMakeValidParams, style C.int) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSMakeValidParams_setKeepCollapsed_r(handle, p, style)
+}
+
+func cGEOSGeomType(g *C.GEOSGeometry) *C.char {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomType_r(handle, g)
+}
+
+func cGEOSGeomTypeId(g *C.GEOSGeometry) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomTypeId_r(handle, g)
 }
 
 func cGEOSGetSRID(g *C.GEOSGeometry) C.int {
@@ -715,6 +919,18 @@ func cGEOSSetSRID(g *C.GEOSGeometry, SRID C.int) {
 	C.GEOSSetSRID_r(handle, g, SRID)
 }
 
+func cGEOSGeom_getUserData(g *C.GEOSGeometry) {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	C.GEOSGeom_getUserData_r(handle, g)
+}
+
+func cGEOSGeom_setUserData(g *C.GEOSGeometry, userData *C.void) {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	C.GEOSGeom_setUserData_r(handle, g, unsafe.Pointer(userData))
+}
+
 func cGEOSGetNumGeometries(g *C.GEOSGeometry) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
@@ -727,34 +943,52 @@ func cGEOSGetGeometryN(g *C.GEOSGeometry, n C.int) *C.GEOSGeometry {
 	return C.GEOSGetGeometryN_r(handle, g, n)
 }
 
-func cGEOSNormalize(g1 *C.GEOSGeometry) C.int {
+func cGEOSNormalize(g *C.GEOSGeometry) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSNormalize_r(handle, g1)
+	return C.GEOSNormalize_r(handle, g)
 }
 
-func cGEOSGetNumInteriorRings(g1 *C.GEOSGeometry) C.int {
+func cGEOSGeom_setPrecision(g *C.GEOSGeometry, gridSize C.double, flags C.int) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSGetNumInteriorRings_r(handle, g1)
+	return C.GEOSGeom_setPrecision_r(handle, g, gridSize, flags)
 }
 
-func cGEOSGeomGetNumPoints(g1 *C.GEOSGeometry) C.int {
+func cGEOSGeom_getPrecision(g *C.GEOSGeometry) C.double {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSGeomGetNumPoints_r(handle, g1)
+	return C.GEOSGeom_getPrecision_r(handle, g)
 }
 
-func cGEOSGeomGetX(g1 *C.GEOSGeometry, x *C.double) C.int {
+func cGEOSGetNumInteriorRings(g *C.GEOSGeometry) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSGeomGetX_r(handle, g1, x)
+	return C.GEOSGetNumInteriorRings_r(handle, g)
 }
 
-func cGEOSGeomGetY(g1 *C.GEOSGeometry, y *C.double) C.int {
+func cGEOSGeomGetNumPoints(g *C.GEOSGeometry) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSGeomGetY_r(handle, g1, y)
+	return C.GEOSGeomGetNumPoints_r(handle, g)
+}
+
+func cGEOSGeomGetX(g *C.GEOSGeometry, x *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomGetX_r(handle, g, x)
+}
+
+func cGEOSGeomGetY(g *C.GEOSGeometry, y *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomGetY_r(handle, g, y)
+}
+
+func cGEOSGeomGetZ(g *C.GEOSGeometry, z *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomGetZ_r(handle, g, z)
 }
 
 func cGEOSGetInteriorRingN(g *C.GEOSGeometry, n C.int) *C.GEOSGeometry {
@@ -769,10 +1003,10 @@ func cGEOSGetExteriorRing(g *C.GEOSGeometry) *C.GEOSGeometry {
 	return C.GEOSGetExteriorRing_r(handle, g)
 }
 
-func cGEOSGetNumCoordinates(g1 *C.GEOSGeometry) C.int {
+func cGEOSGetNumCoordinates(g *C.GEOSGeometry) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSGetNumCoordinates_r(handle, g1)
+	return C.GEOSGetNumCoordinates_r(handle, g)
 }
 
 func cGEOSGeom_getCoordSeq(g *C.GEOSGeometry) *C.GEOSCoordSequence {
@@ -793,40 +1027,76 @@ func cGEOSGeom_getCoordinateDimension(g *C.GEOSGeometry) C.int {
 	return C.GEOSGeom_getCoordinateDimension_r(handle, g)
 }
 
-func cGEOSGeomGetPointN(g1 *C.GEOSGeometry, n C.int) *C.GEOSGeometry {
+func cGEOSGeom_getXMin(g *C.GEOSGeometry, value *C.double) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSGeomGetPointN_r(handle, g1, n)
+	return C.GEOSGeom_getXMin_r(handle, g, value)
 }
 
-func cGEOSGeomGetStartPoint(g1 *C.GEOSGeometry) *C.GEOSGeometry {
+func cGEOSGeom_getYMin(g *C.GEOSGeometry, value *C.double) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSGeomGetStartPoint_r(handle, g1)
+	return C.GEOSGeom_getYMin_r(handle, g, value)
 }
 
-func cGEOSGeomGetEndPoint(g1 *C.GEOSGeometry) *C.GEOSGeometry {
+func cGEOSGeom_getXMax(g *C.GEOSGeometry, value *C.double) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSGeomGetEndPoint_r(handle, g1)
+	return C.GEOSGeom_getXMax_r(handle, g, value)
 }
 
-func cGEOSArea(g1 *C.GEOSGeometry, area *C.double) C.int {
+func cGEOSGeom_getYMax(g *C.GEOSGeometry, value *C.double) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSArea_r(handle, g1, area)
+	return C.GEOSGeom_getYMax_r(handle, g, value)
 }
 
-func cGEOSLength(g1 *C.GEOSGeometry, length *C.double) C.int {
+func cGEOSGeomGetPointN(g *C.GEOSGeometry, n C.int) *C.GEOSGeometry {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSLength_r(handle, g1, length)
+	return C.GEOSGeomGetPointN_r(handle, g, n)
+}
+
+func cGEOSGeomGetStartPoint(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomGetStartPoint_r(handle, g)
+}
+
+func cGEOSGeomGetEndPoint(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomGetEndPoint_r(handle, g)
+}
+
+func cGEOSArea(g *C.GEOSGeometry, area *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSArea_r(handle, g, area)
+}
+
+func cGEOSLength(g *C.GEOSGeometry, length *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSLength_r(handle, g, length)
 }
 
 func cGEOSDistance(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, dist *C.double) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	return C.GEOSDistance_r(handle, g1, g2, dist)
+}
+
+func cGEOSDistanceWithin(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, dist C.double) C.char {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSDistanceWithin_r(handle, g1, g2, dist)
+}
+
+func cGEOSDistanceIndexed(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, dist *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSDistanceIndexed_r(handle, g1, g2, dist)
 }
 
 func cGEOSHausdorffDistance(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, dist *C.double) C.int {
@@ -841,10 +1111,28 @@ func cGEOSHausdorffDistanceDensify(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, densi
 	return C.GEOSHausdorffDistanceDensify_r(handle, g1, g2, densifyFrac, dist)
 }
 
-func cGEOSGeomGetLength(g1 *C.GEOSGeometry, length *C.double) C.int {
+func cGEOSFrechetDistance(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, dist *C.double) C.int {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSGeomGetLength_r(handle, g1, length)
+	return C.GEOSFrechetDistance_r(handle, g1, g2, dist)
+}
+
+func cGEOSFrechetDistanceDensify(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry, densifyFrac C.double, dist *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSFrechetDistanceDensify_r(handle, g1, g2, densifyFrac, dist)
+}
+
+func cGEOSGeomGetLength(g *C.GEOSGeometry, length *C.double) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomGetLength_r(handle, g, length)
+}
+
+func cGEOSNearestPoints(g1 *C.GEOSGeometry, g2 *C.GEOSGeometry) *C.GEOSCoordSequence {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSNearestPoints_r(handle, g1, g2)
 }
 
 func cGEOSOrientationIndex(Ax C.double, Ay C.double, Bx C.double, By C.double, Px C.double, Py C.double) C.int {
@@ -883,10 +1171,10 @@ func cGEOSWKTWriter_destroy(writer *C.GEOSWKTWriter) {
 	C.GEOSWKTWriter_destroy_r(handle, writer)
 }
 
-func cGEOSWKTWriter_write(reader *C.GEOSWKTWriter, g *C.GEOSGeometry) *C.char {
+func cGEOSWKTWriter_write(writer *C.GEOSWKTWriter, g *C.GEOSGeometry) *C.char {
 	handlemu.Lock()
 	defer handlemu.Unlock()
-	return C.GEOSWKTWriter_write_r(handle, reader, g)
+	return C.GEOSWKTWriter_write_r(handle, writer, g)
 }
 
 func cGEOSWKTWriter_setTrim(writer *C.GEOSWKTWriter, trim C.char) {
@@ -991,6 +1279,18 @@ func cGEOSWKBWriter_setByteOrder(writer *C.GEOSWKBWriter, byteOrder C.int) {
 	C.GEOSWKBWriter_setByteOrder_r(handle, writer, byteOrder)
 }
 
+func cGEOSWKBWriter_getFlavor(writer *C.GEOSWKBWriter) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSWKBWriter_getFlavor_r(handle, writer)
+}
+
+func cGEOSWKBWriter_setFlavor(writer *C.GEOSWKBWriter, flavor C.int) {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	C.GEOSWKBWriter_setFlavor_r(handle, writer, flavor)
+}
+
 func cGEOSWKBWriter_getIncludeSRID(writer *C.GEOSWKBWriter) C.char {
 	handlemu.Lock()
 	defer handlemu.Unlock()
@@ -1007,4 +1307,112 @@ func cGEOSFree(buffer *C.void) {
 	handlemu.Lock()
 	defer handlemu.Unlock()
 	C.GEOSFree_r(handle, unsafe.Pointer(buffer))
+}
+
+func cGEOSGeoJSONReader_create() *C.GEOSGeoJSONReader {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeoJSONReader_create_r(handle)
+}
+
+func cGEOSGeoJSONReader_destroy(reader *C.GEOSGeoJSONReader) {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	C.GEOSGeoJSONReader_destroy_r(handle, reader)
+}
+
+func cGEOSGeoJSONReader_readGeometry(reader *C.GEOSGeoJSONReader, geojson *C.char) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeoJSONReader_readGeometry_r(handle, reader, geojson)
+}
+
+func cGEOSGeoJSONWriter_create() *C.GEOSGeoJSONWriter {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeoJSONWriter_create_r(handle)
+}
+
+func cGEOSGeoJSONWriter_destroy(writer *C.GEOSGeoJSONWriter) {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	C.GEOSGeoJSONWriter_destroy_r(handle, writer)
+}
+
+func cGEOSGeoJSONWriter_writeGeometry(writer *C.GEOSGeoJSONWriter, g *C.GEOSGeometry, indent C.int) *C.char {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeoJSONWriter_writeGeometry_r(handle, writer, g, indent)
+}
+
+func cGEOSSingleSidedBuffer(g *C.GEOSGeometry, width C.double, quadsegs C.int, joinStyle C.int, mitreLimit C.double, leftSide C.int) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSSingleSidedBuffer_r(handle, g, width, quadsegs, joinStyle, mitreLimit, leftSide)
+}
+
+func cGEOSGeomFromWKT(wkt *C.char) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomFromWKT_r(handle, wkt)
+}
+
+func cGEOSGeomToWKT(g *C.GEOSGeometry) *C.char {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomToWKT_r(handle, g)
+}
+
+func cGEOS_getWKBOutputDims() C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOS_getWKBOutputDims_r(handle)
+}
+
+func cGEOS_setWKBOutputDims(newDims C.int) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOS_setWKBOutputDims_r(handle, newDims)
+}
+
+func cGEOS_getWKBByteOrder() C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOS_getWKBByteOrder_r(handle)
+}
+
+func cGEOS_setWKBByteOrder(byteOrder C.int) C.int {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOS_setWKBByteOrder_r(handle, byteOrder)
+}
+
+func cGEOSGeomFromWKB_buf(wkb *C.uchar, size C.size_t) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomFromWKB_buf_r(handle, wkb, size)
+}
+
+func cGEOSGeomToWKB_buf(g *C.GEOSGeometry, size *C.size_t) *C.uchar {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomToWKB_buf_r(handle, g, size)
+}
+
+func cGEOSGeomFromHEX_buf(hex *C.uchar, size C.size_t) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomFromHEX_buf_r(handle, hex, size)
+}
+
+func cGEOSGeomToHEX_buf(g *C.GEOSGeometry, size *C.size_t) *C.uchar {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSGeomToHEX_buf_r(handle, g, size)
+}
+
+func cGEOSUnionCascaded(g *C.GEOSGeometry) *C.GEOSGeometry {
+	handlemu.Lock()
+	defer handlemu.Unlock()
+	return C.GEOSUnionCascaded_r(handle, g)
 }

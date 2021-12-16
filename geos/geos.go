@@ -17,6 +17,8 @@ import (
 var (
 	// Required for the thread-safe GEOS C API (the "*_r" functions).
 	handle = C.gogeos_initGEOS()
+	extHandle = handle
+
 	// Protects the handle from being used concurrently in multiple C threads.
 	handlemu sync.Mutex
 )

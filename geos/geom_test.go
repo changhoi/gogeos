@@ -516,7 +516,7 @@ func TestBinaryTopo(t *testing.T) {
 		g2 := Must(FromWKT(test.g2))
 		expected := Must(FromWKT(test.out))
 		if actual := Must(test.method(g1, g2)); !mustEqual(expected.Equals(actual)) {
-			t.Errorf("%+V(): want %v got %v", test.method, expected, actual)
+			t.Errorf("%T(): want %v got %v", test.method, expected, actual)
 		}
 	}
 }
@@ -576,7 +576,7 @@ var unaryTopoTests = []struct {
 	},
 	{
 		"MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)), ((5 5, 15 5, 15 15, 5 15, 5 5)))",
-		"POLYGON ((10 5, 10 0, 0 0, 0 10, 5 10, 5 15, 15 15, 15 5, 10 5))",
+		"POLYGON ((10 0, 0 0, 0 10, 5 10, 5 15, 15 15, 15 5, 10 5, 10 0))",
 		(*Geometry).UnaryUnion,
 	},
 	{
@@ -611,7 +611,7 @@ func TestUnaryTopo(t *testing.T) {
 		g1 := Must(FromWKT(test.g1))
 		expected := Must(FromWKT(test.out))
 		if actual := Must(test.method(g1)); !mustEqual(actual.EqualsExact(expected, 0.0)) {
-			t.Errorf("%+V(): want %v got %v", test.method, expected, actual)
+			t.Errorf("%T(): want %v got %v", test.method, expected, actual)
 		}
 	}
 }
@@ -640,7 +640,7 @@ func TestSimplifyMethods(t *testing.T) {
 		g1 := Must(FromWKT(test.g1))
 		expected := Must(FromWKT(test.out))
 		if actual := Must(test.method(g1, test.tol)); !mustEqual(actual.EqualsExact(expected, 0.0)) {
-			t.Errorf("%+V(): want %v got %v", test.method, expected, actual)
+			t.Errorf("%T(): want %v got %v", test.method, expected, actual)
 		}
 	}
 }
@@ -783,7 +783,7 @@ func TestBinaryPred(t *testing.T) {
 		g1 := Must(FromWKT(test.g1))
 		g2 := Must(FromWKT(test.g2))
 		if actual := mustBool(test.method(g1, g2)); actual != test.pred {
-			t.Errorf("%+V(): want %v got %v", test.method, test.pred, actual)
+			t.Errorf("%T(): want %v got %v", test.method, test.pred, actual)
 		}
 	}
 }
@@ -1003,7 +1003,7 @@ func TestWKB(t *testing.T) {
 			t.Fatalf("#%d %v", i, err)
 		}
 		if !bytes.Equal(wkb, test.wkb) {
-			t.Errorf("#%d want %v got %v", test.wkb, wkb)
+			t.Errorf("#%d want %v got %v", i, test.wkb, wkb)
 		}
 	}
 }
@@ -1016,7 +1016,7 @@ func TestHex(t *testing.T) {
 			t.Fatalf("#%d %v", i, err)
 		}
 		if !bytes.Equal(hex, test.wkb) {
-			t.Errorf("#%d want %v got %v", string(test.wkb), string(hex))
+			t.Errorf("#%d want %v got %v", i, string(test.wkb), string(hex))
 		}
 	}
 }
