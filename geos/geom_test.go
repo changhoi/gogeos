@@ -980,7 +980,7 @@ func TestFromGeoJSON(t *testing.T) {
 		g1 := Must(FromGeoJSON(test.geoJSON))
 		g2 := Must(FromWKT(test.wkt))
 		if ! mustEqual(g1.Equals(g2)) {
-			t.Errorf("#%d want %s, got %s", i, test.wkt, g1.String())
+			t.Errorf("#%d want %v, got %v", i, test.wkt, g1.String())
 		}
 	}
 }
