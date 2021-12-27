@@ -975,6 +975,16 @@ func TestRelatePat(t *testing.T) {
 	}
 }
 
+func TestFromGeoJSON(t *testing.T) {
+	for i, test := range geoJSONDecoderTests {
+		g1 := Must(FromGeoJSON(test.geoJSON))
+		g2 := Must(FromWKT(test.wkt))
+		if ! mustEqual(g1.Equals(g2)) {
+			t.Errorf("#%d want %v, got %v", i, test.wkt, g1.String())
+		}
+	}
+}
+
 func TestFromWKB(t *testing.T) {
 	for i, test := range wkbDecoderTests {
 		g1 := Must(FromWKB(test.wkb))

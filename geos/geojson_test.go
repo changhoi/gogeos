@@ -29,3 +29,17 @@ func TestGeoJSONEncoder(t *testing.T) {
 		}
 	}
 }
+
+var geoJSONDecoderTests = []struct {
+	geoJSON string
+	wkt     string
+}{
+	{`{"type":"Point","coordinates":[-117,35]}`, "POINT(-117 35)"},
+	{
+		`{"type":"Polygon","coordinates":[[[0,0],[0,2],[2,2],[2,0],[0,0]],[[1,1],[1,1.5],[1.5,1.5],[1.5,1],[1, 1]]]}`,
+		"POLYGON ((0 0, 0 2, 2 2, 2 0, 0 0), (1 1, 1 1.5, 1.5 1.5, 1.5 1, 1 1))",
+	},
+	{
+		`{"type": "LineString","coordinates": [[1, 2],[3, 2]]}`, "LINESTRING(1 2, 3 2)",
+	},
+}

@@ -51,6 +51,13 @@ func geomFromPtrUnowned(ptr *C.GEOSGeometry) (*Geometry, error) {
 	return &Geometry{g: ptr}, nil
 }
 
+// FromGeoJSON is a factory function that returns a new Geometry decoded from a
+// GeoJSON string.
+func FromGeoJSON(geoJSON string) (*Geometry, error) {
+	decoder := newGeoJSONDecoder()
+	return decoder.decode(geoJSON)
+}
+
 // FromWKT is a factory function that returns a new Geometry decoded from a
 // Well-Known Text (WKT) string.
 func FromWKT(wkt string) (*Geometry, error) {
