@@ -1005,6 +1005,20 @@ func TestFromHex(t *testing.T) {
 	}
 }
 
+func TestToGeoJSON(t *testing.T) {
+	for i, test := range geoJSONEncoderTests {
+		g := Must(FromWKT(test.middle))
+		geojson, err := g.ToGeoJSON()
+		if err != nil {
+			t.Fatalf("#%d %v", i, err)
+		}
+
+		if geojson != test.out {
+			t.Errorf("#%d want %v got %v", i, test.out, geojson)
+		}
+	}
+}
+
 func TestWKB(t *testing.T) {
 	for i, test := range wkbEncoderTests {
 		g := Must(FromWKT(test.wkt))

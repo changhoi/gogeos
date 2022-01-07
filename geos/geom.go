@@ -79,6 +79,12 @@ func FromHex(hex string) (*Geometry, error) {
 	return decoder.decodeHex(hex)
 }
 
+// ToGeoJSON returns a string encoding of the geometry, in GeoJSON format.
+func (g *Geometry) ToGeoJSON() (string, error) {
+	encoder := newGeoJSONEncoder()
+	return encoder.encode(g)
+}
+
 // ToWKT returns a string encoding of the geometry, in Well-Known Text (WKT)
 // format.
 func (g *Geometry) ToWKT() (string, error) {
