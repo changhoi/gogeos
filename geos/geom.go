@@ -51,6 +51,17 @@ func geomFromPtrUnowned(ptr *C.GEOSGeometry) (*Geometry, error) {
 	return &Geometry{g: ptr}, nil
 }
 
+// UnmarshalJSON is a function that implements json.Unmarshaler type.
+func (g *Geometry) UnmarshalJSON(data []byte) error {
+	geom, err := FromGeoJSON(string(data))
+	if err != nil {
+		return err
+	}
+
+	g.g = geom.g
+	return nil
+}
+
 // FromGeoJSON is a factory function that returns a new Geometry decoded from a
 // GeoJSON string.
 func FromGeoJSON(geoJSON string) (*Geometry, error) {
@@ -83,6 +94,16 @@ func FromHex(hex string) (*Geometry, error) {
 func (g *Geometry) ToGeoJSON() (string, error) {
 	encoder := newGeoJSONEncoder()
 	return encoder.encode(g)
+}
+
+// MarshalJSON is a function that implements json.Marshaler type.
+func (g *Geometry) MarshalJSON() ([]byte, error) {
+	geoJSON, err := g.ToGeoJSON()
+	if err != nil {
+		return nil, err
+	}
+
+	return []byte(geoJSON), err
 }
 
 // ToWKT returns a string encoding of the geometry, in Well-Known Text (WKT)
