@@ -2,6 +2,7 @@ package geos
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"math"
 	"testing"
@@ -978,7 +979,7 @@ func TestRelatePat(t *testing.T) {
 func TestUnmarshalJSON(t *testing.T) {
 	for i, test := range geoJSONDecoderTests {
 		var g1 Geometry
-		err := g1.UnmarshalJSON([]byte(test.geoJSON))
+		err := json.Unmarshal([]byte(test.geoJSON), &g1)
 		if err != nil {
 			t.Fatalf("#%d %v", i, err)
 		}
@@ -1038,7 +1039,7 @@ func TestToGeoJSON(t *testing.T) {
 func TestMarshalJSON(t *testing.T) {
 	for i, test := range geoJSONEncoderTests {
 		g := Must(FromWKT(test.middle))
-		geoJSON, err := g.MarshalJSON()
+		geoJSON, err := json.Marshal(g)
 		if err != nil {
 			t.Fatalf("#%d %v", i, err)
 		}

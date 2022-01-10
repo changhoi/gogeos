@@ -103,7 +103,7 @@ func (g *Geometry) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	return []byte(geoJSON), err
+	return []byte(geoJSON), nil
 }
 
 // ToWKT returns a string encoding of the geometry, in Well-Known Text (WKT)
