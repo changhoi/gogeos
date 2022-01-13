@@ -2,6 +2,7 @@ package geos
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"math"
 	"testing"
@@ -975,11 +976,27 @@ func TestRelatePat(t *testing.T) {
 	}
 }
 
+func TestUnmarshalJSON(t *testing.T) {
+	for i, test := range geoJSONDecoderTests {
+		var g1 Geometry
+		err := json.Unmarshal([]byte(test.geoJSON), &g1)
+		if err != nil {
+			t.Fatalf("#%d %v", i, err)
+		}
+
+		g2 := Must(FromWKT(test.wkt))
+
+		if !mustEqual(g1.Equals(g2)) {
+			t.Errorf("#%d want %v, got %v", i, test.wkt, g1.String())
+		}
+	}
+}
+
 func TestFromGeoJSON(t *testing.T) {
 	for i, test := range geoJSONDecoderTests {
 		g1 := Must(FromGeoJSON(test.geoJSON))
 		g2 := Must(FromWKT(test.wkt))
-		if ! mustEqual(g1.Equals(g2)) {
+		if !mustEqual(g1.Equals(g2)) {
 			t.Errorf("#%d want %v, got %v", i, test.wkt, g1.String())
 		}
 	}
@@ -1001,6 +1018,34 @@ func TestFromHex(t *testing.T) {
 		g2 := Must(FromWKT(test.wkt))
 		if !mustEqual(g1.Equals(g2)) {
 			t.Errorf("#%d want %v got %v", i, test.wkt, g1.String())
+		}
+	}
+}
+
+func TestToGeoJSON(t *testing.T) {
+	for i, test := range geoJSONEncoderTests {
+		g := Must(FromWKT(test.middle))
+		geoJSON, err := g.ToGeoJSON()
+		if err != nil {
+			t.Fatalf("#%d %v", i, err)
+		}
+
+		if geoJSON != test.out {
+			t.Errorf("#%d want %v got %v", i, test.out, geoJSON)
+		}
+	}
+}
+
+func TestMarshalJSON(t *testing.T) {
+	for i, test := range geoJSONEncoderTests {
+		g := Must(FromWKT(test.middle))
+		geoJSON, err := json.Marshal(g)
+		if err != nil {
+			t.Fatalf("#%d %v", i, err)
+		}
+
+		if string(geoJSON) != test.out {
+			t.Errorf("#%d want %v got %v", i, test.out, string(geoJSON))
 		}
 	}
 }
